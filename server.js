@@ -6,10 +6,15 @@ const dotEnv = require('dotenv');
 const resolvers = require('./resolvers');
 const typeDefs = require('./typeDefs');
 
+const { connection } = require('./database/util');
+
 dotEnv.config();
 
-
 const app = express();
+
+//db connectivity
+connection();
+
 app.use(cors());
 app.use(express.json());
 
