@@ -1,11 +1,11 @@
-# graphql-apollo-api
+### graphql-apollo-api
 
-`shell
+```shell
 
 -   npm init -y defuolt package.json
 -   npm install express apollo-server-express cors dotenv
 -   npm install -D nodemon
--   ❯ npm install uuid
+-   npm install uuid
 -   npm install mongoose
 -   npm install bcryptjs
 -   npm install jsonwebtoken
@@ -13,4 +13,4 @@
 -   npm install graphql-resolvers
 -   npm install dataloader
 
-`
+```
