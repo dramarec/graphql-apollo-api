@@ -34,8 +34,6 @@ module.exports = gql`
     tasks: [Task!]
     createdAt: Date!
     updatedAt: Date!
-    # createdAt: String!
-    # updatedAt: String!
   }
 
 `;

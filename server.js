@@ -13,7 +13,6 @@ dotEnv.config();
 
 const app = express();
 
-//db connectivity
 connection();
 
 app.use(cors());
@@ -26,7 +25,8 @@ const apolloServer = new ApolloServer({
     context: async ({ req }) => {
         await verifyUser(req)
         return {
-            email: req.email
+            email: req.email,
+            loggedInUserId: req.loggedInUserId,
         }
 
     }

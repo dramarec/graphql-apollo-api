@@ -2,16 +2,28 @@ const { combineResolvers } = require('graphql-resolvers');
 
 const Task = require('../database/models/task');
 const User = require('../database/models/user');
-const { isAuthenticated } = require('./middleware');
+const { isAuthenticated, isTaskOwner } = require('./middleware');
 
 module.exports = {
     Query: {
-        tasks: () => {
-            return tasks;
-        },
-        task: (_, { id }) => {
-            return tasks.find(task => task.id === id)
-        },
+        tasks: combineResolvers(isAuthenticated, async (_, __, { loggedInUserId }) => {
+            try {
+                const tasks = await Task.find({ user: loggedInUserId })
+                return tasks
+            } catch (error) {
+                console.log(error);
+                throw error;
+            }
+        }),
+        task: combineResolvers(isAuthenticated, isTaskOwner, async (_, { id }) => {
+            try {
+                const task = await Task.findById(id);
+                return task;
+            } catch (error) {
+                console.log(error);
+                throw error;
+            }
+        }),
     },
     Mutation: {
         createTask: combineResolvers(isAuthenticated, async (_, { input }, { email }) => {
@@ -29,8 +41,17 @@ module.exports = {
         }),
     },
     Task: {
-        user: ({ userId }) => {
-            return users.find(user => user.id === userId)
+        // user: ({ userId }) => {
+        //     return users.find(user => user.id === userId)
+        // }
+        user: async (parent) => {
+            try {
+                const user = await User.findById(parent.user);
+                return user;
+            } catch (error) {
+                console.log(error);
+                throw error;
+            }
         }
     }
 }
