@@ -5,20 +5,20 @@ const { combineResolvers } = require('graphql-resolvers');
 const Task = require('../database/models/task');
 const User = require('../database/models/user');
 const { isAuthenticated } = require('./middleware');
+const PubSub = require('../subscription');
+const { userEvents } = require('../subscription/events');
 
 module.exports = {
     Query: {
         user: combineResolvers(isAuthenticated, async (_, __, { email }) => {
             try {
-                console.log("🔥🚀 ===> email", email);
                 const user = await User.findOne({ email })
-                console.log("🔥🚀 ===> user:combineResolvers ===> user", user);
                 if (!user) {
                     throw new Error('User not found!')
                 }
                 return user
             } catch (error) {
-                console.log("🔥🚀 ===> user:combineResolvers ===> error", error);
+                console.log(error);
                 throw error
             }
         })
@@ -33,7 +33,11 @@ module.exports = {
                 const hashedPassword = await bcrypt.hash(input.password, 12);
                 const newUser = new User({ ...input, password: hashedPassword });
                 const result = await newUser.save();
-              
+
+                PubSub.publish(userEvents.USER_CREATED, {
+                    userCreated: result
+                });
+
                 return result;
             } catch (error) {
                 console.log(error);
@@ -58,6 +62,11 @@ module.exports = {
                 throw error;
             }
         },
+    },
+    Subscription: {
+        userCreated: {
+            subscribe: () => PubSub.asyncIterator(userEvents.USER_CREATED)
+        }
     },
     User: {
         tasks: async ({ id }) => {

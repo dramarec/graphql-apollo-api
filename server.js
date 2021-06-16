@@ -24,15 +24,22 @@ app.use(express.json());
 const apolloServer = new ApolloServer({
     typeDefs,
     resolvers,
-    context: async ({ req }) => {
-        await verifyUser(req)
-        return {
-            email: req.email,
-            loggedInUserId: req.loggedInUserId,
-            loaders: {
-                user: new Dataloader(keys => loaders.user.batchUsers(keys))
-            }
+    context: async ({ req, connection }) => {
+        const contextObj = {};
+        if (req) {
+            await verifyUser(req)
+            contextObj.email = req.email;
+            contextObj.loggedInUserId = req.loggedInUserId;
         }
+        contextObj.loaders = {
+            user: new Dataloader(keys => loaders.user.batchUsers(keys))
+        };
+        return contextObj;
+    },
+    formatError: (error) => {
+        return {
+            message: error.message
+        };
     }
 });
 
@@ -44,7 +51,9 @@ app.use('/', (req, res, next) => {
     res.send({ message: 'Hello' });
 })
 
-app.listen(PORT, () => {
+const httpServer = app.listen(PORT, () => {
     console.log(`Server listening on PORT: http://localhost:${PORT}`);
     console.log(`Graphql Endpoint: http://localhost:${PORT}${apolloServer.graphqlPath}`);
 });
+
+apolloServer.installSubscriptionHandlers(httpServer);
