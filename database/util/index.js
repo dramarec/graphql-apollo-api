@@ -13,7 +13,7 @@ module.exports.connection = async () => {
         throw error;
     }
 }
-// 32
+
 module.exports.isValidObjectId = (id) => {
     return mongoose.Types.ObjectId.isValid(id);
 }

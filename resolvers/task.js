@@ -39,11 +39,27 @@ module.exports = {
                 throw error;
             }
         }),
+        updateTask: combineResolvers(isAuthenticated, isTaskOwner, async (_, { id, input }) => {
+            try {
+                const task = await Task.findByIdAndUpdate(id, { ...input }, { new: true });
+                return task;
+            } catch (error) {
+                console.log(error);
+                throw error;
+            }
+        }),
+        deleteTask: combineResolvers(isAuthenticated, isTaskOwner, async (_, { id }, { loggedInUserId }) => {
+            try {
+                const task = await Task.findByIdAndDelete(id);
+                await User.updateOne({ _id: loggedInUserId }, { $pull: { tasks: task.id } });
+                return task;
+            } catch (error) {
+                console.log(error);
+                throw error;
+            }
+        })
     },
     Task: {
-        // user: ({ userId }) => {
-        //     return users.find(user => user.id === userId)
-        // }
         user: async (parent) => {
             try {
                 const user = await User.findById(parent.user);
