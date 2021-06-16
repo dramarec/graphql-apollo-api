@@ -13,7 +13,6 @@ module.exports = {
             try {
                 console.log("🔥🚀 ===> email", email);
                 const user = await User.findOne({ email })
-                // .populate({ path: "tasks" })
                 console.log("🔥🚀 ===> user:combineResolvers ===> user", user);
                 if (!user) {
                     throw new Error('User not found!')
@@ -24,8 +23,6 @@ module.exports = {
                 throw error
             }
         })
-
-
     },
     Mutation: {
         signup: async (_, { input }) => {
@@ -37,9 +34,7 @@ module.exports = {
                 const hashedPassword = await bcrypt.hash(input.password, 12);
                 const newUser = new User({ ...input, password: hashedPassword });
                 const result = await newUser.save();
-                // PubSub.publish(userEvents.USER_CREATED, {
-                //   userCreated: result
-                // });
+              
                 return result;
             } catch (error) {
                 console.log(error);
@@ -66,8 +61,6 @@ module.exports = {
         },
     },
     User: {
-        // tasks: ({ id }) => tasks.filter(task => task.userId === id),
-        // createdAt: () => "2021-06-15T19:44:54.517Z"  // if  # createdAt: String!
         tasks: async ({ id }) => {
             try {
                 const tasks = await Task.find({ user: id });
