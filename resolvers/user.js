@@ -2,27 +2,30 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const { combineResolvers } = require('graphql-resolvers');
 
-const { users, tasks } = require('../constants');
+// const { users, tasks } = require('../constants');
+const Task = require('../database/models/task');
 const User = require('../database/models/user');
 const { isAuthenticated } = require('./middleware');
 
 module.exports = {
     Query: {
-        users: () => users,
-        // user: (_, { id }) => users.find(user => user.id === id)
-        user: combineResolvers(isAuthenticated, (_, { id }, { email }) => {
-            console.log("🔥🚀 ===> email", email);
-            return users.find(user => user.id === id)
+        user: combineResolvers(isAuthenticated, async (_, __, { email }) => {
+            try {
+                console.log("🔥🚀 ===> email", email);
+                const user = await User.findOne({ email })
+                // .populate({ path: "tasks" })
+                console.log("🔥🚀 ===> user:combineResolvers ===> user", user);
+                if (!user) {
+                    throw new Error('User not found!')
+                }
+                return user
+            } catch (error) {
+                console.log("🔥🚀 ===> user:combineResolvers ===> error", error);
+                throw error
+            }
         })
-        
-        // ? vich one better -------------------------------  
-        // user: (_, { id }, { email }) => {
-        //     console.log("🔥🚀 ===> email", email);
-        //     if (!email) {
-        //         throw new Error('Access denied! Please login!')
-        //     }
-        //     return users.find(user => user.id === id)
-        // }
+
+
     },
     Mutation: {
         signup: async (_, { input }) => {
@@ -63,7 +66,16 @@ module.exports = {
         },
     },
     User: {
-        tasks: ({ id }) => tasks.filter(task => task.userId === id),
+        // tasks: ({ id }) => tasks.filter(task => task.userId === id),
         // createdAt: () => "2021-06-15T19:44:54.517Z"  // if  # createdAt: String!
+        tasks: async ({ id }) => {
+            try {
+                const tasks = await Task.find({ user: id });
+                return tasks;
+            } catch (error) {
+                console.log(error);
+                throw error;
+            }
+        }
     }
 }
