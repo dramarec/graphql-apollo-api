@@ -1,5 +1,6 @@
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const { combineResolvers } = require('graphql-resolvers');
 
 const { users, tasks } = require('../constants');
 const User = require('../database/models/user');
@@ -7,7 +8,18 @@ const User = require('../database/models/user');
 module.exports = {
     Query: {
         users: () => users,
-        user: (_, { id }) => users.find(user => user.id === id)
+        // user: (_, { id }) => users.find(user => user.id === id)
+        // user: combineResolvers(isAuthenticated, (_, { id }, { email }) => {
+        //     return users.find(user => user.id === id)
+        // })
+        // ? vich one better -------------------------------  
+        user: (_, { id }, { email }) => {
+            console.log("🔥🚀 ===> email", email);
+            if (!email) {
+                throw new Error('Access denied! Please login!')
+            }
+            return users.find(user => user.id === id)
+        }
     },
     Mutation: {
         signup: async (_, { input }) => {
