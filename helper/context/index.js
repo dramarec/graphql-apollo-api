@@ -12,7 +12,6 @@ module.exports.verifyUser = async (req) => {
             req.email = payload.email;
 
             const user = await User.findOne({ email: payload.email });
-            // console.log("🔥🚀 ===> module.exports.verifyUser= ===> user", user);
             req.loggedInUserId = user.id;
         }
     } catch (error) {

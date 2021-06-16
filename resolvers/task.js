@@ -9,12 +9,10 @@ module.exports = {
     Query: {
         tasks: combineResolvers(isAuthenticated, async (_,
             {
-                // skip = 0,
                 cursor,
                 limit = 5
             }, { loggedInUserId }) => {
             try {
-                // cursor pagination https://graphql.org/learn/pagination/
                 const query = { user: loggedInUserId };
                 if (cursor) {
                     query['_id'] = {
@@ -31,10 +29,7 @@ module.exports = {
                         hasNextPage
                     }
                 };
-                // 
-                // const tasks = await Task.find({ user: loggedInUserId })
-                //     .sort({ _id: -1 }).skip(skip).limit(limit);
-                // return tasks
+              
             } catch (error) {
                 console.log(error);
                 throw error;
@@ -85,12 +80,9 @@ module.exports = {
         })
     },
     Task: {
-        // user: async (parent) => {
         user: async (parent, _, { loaders }) => {
             try {
-                // const user = await User.findById(parent.user);
                 const user = await loaders.user.load(parent.user.toString());
-
                 return user;
             } catch (error) {
                 console.log(error);
