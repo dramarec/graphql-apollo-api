@@ -31,10 +31,10 @@ module.exports = gql`
     name: String!
     email: String!
     tasks: [Task!]
-    # createdAt: Date!
-    # updatedAt: Date!
-    createdAt: String!
-    updatedAt: String!
+    createdAt: Date!
+    updatedAt: Date!
+    # createdAt: String!
+    # updatedAt: String!
   }
 
 `;
