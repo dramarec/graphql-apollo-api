@@ -11,5 +11,6 @@
 -   npm install jsonwebtoken
 -   npm install graphql-iso-date https://www.apollographql.com/docs/apollo-server/schema/custom-scalars/
 -   npm install graphql-resolvers
+-   npm install dataloader
 
 `
