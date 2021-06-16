@@ -8,7 +8,7 @@ module.exports.isAuthenticated = (_, __, { email }) => {
     }
     return skip;
 }
- 
+
 // module.exports.isTaskOwner = async (_, { id }, { loggedInUserId }) => {
 //     try {
 //         if (!isValidObjectId(id)) {
